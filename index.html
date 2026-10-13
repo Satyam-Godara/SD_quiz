@@ -22,7 +22,7 @@ button{font:inherit}.primary,.secondary,.danger{border:0;border-radius:10px;padd
 .question{font-size:1.15rem;font-weight:700;margin:14px 0 18px;white-space:pre-wrap}.options{display:grid;gap:10px}.option{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);padding:13px;border-radius:11px;cursor:pointer;background:#fff}.option:hover{border-color:#9eafea}.option.selected{border-color:var(--brand);background:#f0f3ff}.option input{margin-top:5px;accent-color:var(--brand)}.option .letter{font-weight:800;color:var(--brand);min-width:22px}
 .quiz-bottom{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:20px}.nav-buttons{display:flex;gap:8px;flex-wrap:wrap}.layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:16px;align-items:start}.side{position:sticky;top:12px}.number-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.num-btn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:7px 0;cursor:pointer}.num-btn.answered{background:#e9f7ef;border-color:#9ad5b3;color:#146b3d}.num-btn.current{outline:2px solid var(--brand);outline-offset:1px}.num-btn.flagged{box-shadow:inset 0 -3px #e5a100}
 .legend{font-size:.82rem;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;background:#dfe6f0}.dot.answered{background:#48a66f}.dot.current{background:var(--brand)}.dot.flagged{background:#e5a100}
-.result-score{font-size:2.4rem;font-weight:850;color:var(--brand);line-height:1.2}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:18px 0}.stat{padding:14px;background:#f7f9fc;border-radius:10px}.stat strong{display:block;font-size:1.4rem}.review-item{border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}.review-item.correct{border-left:5px solid var(--good)}.review-item.wrong{border-left:5px solid var(--bad)}.review-item.unanswered{border-left:5px solid #9aa5b7}.review-options{margin:10px 0}.right{color:var(--good);font-weight:700}.wrong-text{color:var(--bad);font-weight:700}
+.result-score{font-size:2.4rem;font-weight:850;color:var(--brand);line-height:1.2}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:18px 0}.stat{padding:14px;background:#f7f9fc;border-radius:10px}.stat strong{display:block;font-size:1.4rem}.answer-reveal{margin-top:14px;padding:13px;border-radius:11px;border:1px solid #9ad5b3;background:#effaf3}.answer-reveal.incorrect{border-color:#f0b4b4;background:#fff4f4}.answer-reveal strong{display:block;margin-bottom:4px}.review-item{border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}.review-item.correct{border-left:5px solid var(--good)}.review-item.wrong{border-left:5px solid var(--bad)}.review-item.unanswered{border-left:5px solid #9aa5b7}.review-options{margin:10px 0}.right{color:var(--good);font-weight:700}.wrong-text{color:var(--bad);font-weight:700}
 footer{text-align:center;color:var(--muted);font-size:.85rem;padding:10px 16px 30px}
 @media(max-width:800px){.layout{grid-template-columns:1fr}.side{position:static}.number-grid{grid-template-columns:repeat(10,1fr)}}
 @media(max-width:520px){main{padding:14px 10px 32px}.panel,.quiz-card,.result-card{padding:15px}.number-grid{grid-template-columns:repeat(5,1fr)}.question{font-size:1.05rem}}
@@ -55,7 +55,8 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;padding:10px 16px 3
       <div class="q-meta"><span id="qCounter"></span><span class="pill" id="difficulty"></span><span class="pill" id="qId"></span></div>
       <div class="question" id="questionText"></div>
       <div class="options" id="options"></div>
-      <div class="quiz-bottom"><button class="secondary" id="clearAnswer">Clear answer</button><div class="nav-buttons"><button class="secondary" id="prevBtn">← Previous</button><button class="primary" id="nextBtn">Next →</button><button class="danger" id="finishBtn">Finish quiz</button></div></div>
+      <div id="answerReveal" class="hidden" aria-live="polite"></div>
+      <div class="quiz-bottom"><div class="nav-buttons"><button class="secondary" id="clearAnswer">Clear answer</button><button class="secondary" id="showAnswerBtn" disabled>Show answer</button></div><div class="nav-buttons"><button class="secondary" id="prevBtn">← Previous</button><button class="primary" id="nextBtn">Next →</button><button class="danger" id="finishBtn">Finish quiz</button></div></div>
     </div>
     <aside class="panel side"><h2>Question navigator</h2><div class="number-grid" id="numberGrid"></div><div class="legend"><span><i class="dot answered"></i>Answered</span><span><i class="dot current"></i>Current</span></div><button class="secondary" style="width:100%;margin-top:10px" id="backHome">Exit to sets</button></aside>
   </div>
@@ -70,7 +71,7 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;padding:10px 16px 3
 <script>
 const DATA_URL = './questions.json';
 let allQuestions = [];
-let currentSet = 1, quizQuestions = [], currentIndex = 0, answers = {}, optionOrders = {}, timerSeconds = 0, timerInterval = null, deadline = null, submitted = false;
+let currentSet = 1, quizQuestions = [], currentIndex = 0, answers = {}, optionOrders = {}, revealedAnswers = {}, timerSeconds = 0, timerInterval = null, deadline = null, submitted = false;
 const $ = id => document.getElementById(id);
 const sets = [
   {n:1,start:1,end:100},{n:2,start:101,end:200},{n:3,start:201,end:300},{n:4,start:301,end:400},{n:5,start:401,end:500}
@@ -93,7 +94,7 @@ $('timerMode').addEventListener('change',()=> $('customWrap').classList.toggle('
 function startQuiz(setNo){
   currentSet=setNo;const range=sets[setNo-1];
   quizQuestions=shuffle(allQuestions.filter(q=>q.number>=range.start&&q.number<=range.end));
-  answers={};optionOrders={};currentIndex=0;submitted=false;
+  answers={};optionOrders={};revealedAnswers={};currentIndex=0;submitted=false;
   if($('shuffleOptions').value==='yes') quizQuestions.forEach(q=>optionOrders[q.id]=shuffle(['A','B','C','D']));
   else quizQuestions.forEach(q=>optionOrders[q.id]=['A','B','C','D']);
   const mode=$('timerMode').value;
@@ -120,14 +121,29 @@ function renderQuestion(){
     return `<label class="option ${selected===letter?'selected':''}"><input type="radio" name="answer" value="${letter}" ${selected===letter?'checked':''}><span class="letter">${letter}.</span><span>${escapeHtml(text)}</span></label>`;
   }).join('');
   $('options').querySelectorAll('input').forEach(r=>r.addEventListener('change',()=>{answers[q.id]=r.value;renderQuestion();}));
+  $('showAnswerBtn').textContent=revealedAnswers[q.id]?'Answer shown':'Show answer';
+  $('showAnswerBtn').disabled=!!revealedAnswers[q.id];
+  renderAnswerReveal(q, selected);
   $('prevBtn').disabled=currentIndex===0;$('nextBtn').textContent=currentIndex===quizQuestions.length-1?'Last question →':'Next →';
   $('progress').style.width=`${(currentIndex+1)/quizQuestions.length*100}%`;
   document.querySelectorAll('.num-btn').forEach((b,i)=>{b.classList.toggle('current',i===currentIndex);b.classList.toggle('answered',!!answers[quizQuestions[i].id]);});
 }
+function renderAnswerReveal(q, selected){
+  const box=$('answerReveal');
+  if(!revealedAnswers[q.id]){box.classList.add('hidden');box.innerHTML='';return;}
+  box.classList.remove('hidden');
+  const hasSelection=!!selected;
+  const correct=hasSelection && selected===q.correct;
+  const answer=q.correct?`${q.correct}. ${q.options['ABCD'.indexOf(q.correct)]}`:'Answer key missing';
+  box.className=`answer-reveal ${hasSelection&&!correct?'incorrect':''}`;
+  const heading=hasSelection?(correct?'Correct!':'Not quite.'):'Answer revealed';
+  box.innerHTML=`<strong>${heading}</strong><div>Correct answer: ${escapeHtml(answer)}</div>${q.explanation?`<p>${escapeHtml(q.explanation)}</p>`:''}`;
+}
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 $('prevBtn').onclick=()=>{if(currentIndex>0){currentIndex--;renderQuestion();}};
 $('nextBtn').onclick=()=>{if(currentIndex<quizQuestions.length-1){currentIndex++;renderQuestion();}};
-$('clearAnswer').onclick=()=>{delete answers[quizQuestions[currentIndex].id];renderQuestion();};
+$('clearAnswer').onclick=()=>{delete answers[quizQuestions[currentIndex].id];delete revealedAnswers[quizQuestions[currentIndex].id];renderQuestion();};
+$('showAnswerBtn').onclick=()=>{const q=quizQuestions[currentIndex];revealedAnswers[q.id]=true;renderQuestion();};
 $('finishBtn').onclick=()=>{const blank=quizQuestions.length-Object.keys(answers).length;if(blank>0&&!confirm(`You have ${blank} unanswered question(s). Submit anyway?`))return;finishQuiz(false);};
 $('backHome').onclick=()=>{if(confirm('Exit this attempt? Your answers in this attempt will be discarded.')){stopTimer();$('quiz').classList.add('hidden');$('home').classList.remove('hidden');}};
 function updateTimer(){
