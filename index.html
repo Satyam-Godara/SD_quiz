@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCQ Practice Quiz</title>
+<style>
+:root{color-scheme:light;--bg:#f4f7fb;--card:#fff;--ink:#172033;--muted:#65718a;--line:#dfe6f0;--brand:#3157d5;--brand2:#233fa8;--good:#147d48;--bad:#c13737}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(120deg,#162d75,#3157d5);color:#fff;padding:26px 20px}
+header .wrap,main{max-width:1100px;margin:auto}h1{margin:0 0 5px;font-size:clamp(1.5rem,3vw,2.2rem)}header p{margin:0;color:#e4eaff}
+main{padding:22px 16px 48px}.panel,.quiz-card,.result-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 5px 20px #1720330a;margin-bottom:16px}
+h2{margin:0 0 14px;font-size:1.2rem}.muted{color:var(--muted)}.set-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.set-btn{border:1px solid var(--line);border-radius:12px;padding:16px;text-align:left;background:#fff;cursor:pointer;color:var(--ink);transition:.15s}
+.set-btn:hover{border-color:var(--brand);transform:translateY(-1px)}.set-btn strong{display:block;font-size:1.05rem}.set-btn span{display:block;color:var(--muted);font-size:.9rem;margin-top:4px}
+.controls{display:flex;gap:14px;flex-wrap:wrap;align-items:end}.field{display:flex;flex-direction:column;gap:6px}.field label{font-weight:650;font-size:.92rem}
+select,input[type=number]{font:inherit;border:1px solid var(--line);border-radius:9px;padding:10px;background:#fff;color:var(--ink)}
+button{font:inherit}.primary,.secondary,.danger{border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer}.primary{background:var(--brand);color:white}.primary:hover{background:var(--brand2)}.secondary{background:#edf1ff;color:#253f9c}.danger{background:#fff0f0;color:var(--bad)}
+.hidden{display:none!important}.quiz-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}.progress-wrap{height:8px;background:#e9edf5;border-radius:9px;overflow:hidden;margin:12px 0}.progress{height:100%;background:var(--brand);width:0;transition:width .2s}
+.timer{font-weight:800;font-variant-numeric:tabular-nums;padding:7px 12px;background:#fff4df;border:1px solid #f5dba8;border-radius:9px}.timer.low{background:#fff0f0;border-color:#f3b5b5;color:var(--bad)}
+.q-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:.92rem}.pill{background:#edf1ff;color:#304cae;padding:3px 9px;border-radius:20px;font-size:.82rem;font-weight:700}
+.question{font-size:1.15rem;font-weight:700;margin:14px 0 18px;white-space:pre-wrap}.options{display:grid;gap:10px}.option{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);padding:13px;border-radius:11px;cursor:pointer;background:#fff}.option:hover{border-color:#9eafea}.option.selected{border-color:var(--brand);background:#f0f3ff}.option input{margin-top:5px;accent-color:var(--brand)}.option .letter{font-weight:800;color:var(--brand);min-width:22px}
+.quiz-bottom{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:20px}.nav-buttons{display:flex;gap:8px;flex-wrap:wrap}.layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:16px;align-items:start}.side{position:sticky;top:12px}.number-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.num-btn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:7px 0;cursor:pointer}.num-btn.answered{background:#e9f7ef;border-color:#9ad5b3;color:#146b3d}.num-btn.current{outline:2px solid var(--brand);outline-offset:1px}.num-btn.flagged{box-shadow:inset 0 -3px #e5a100}
+.legend{font-size:.82rem;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;background:#dfe6f0}.dot.answered{background:#48a66f}.dot.current{background:var(--brand)}.dot.flagged{background:#e5a100}
+.result-score{font-size:2.4rem;font-weight:850;color:var(--brand);line-height:1.2}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:18px 0}.stat{padding:14px;background:#f7f9fc;border-radius:10px}.stat strong{display:block;font-size:1.4rem}.review-item{border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}.review-item.correct{border-left:5px solid var(--good)}.review-item.wrong{border-left:5px solid var(--bad)}.review-item.unanswered{border-left:5px solid #9aa5b7}.review-options{margin:10px 0}.right{color:var(--good);font-weight:700}.wrong-text{color:var(--bad);font-weight:700}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:10px 16px 30px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.side{position:static}.number-grid{grid-template-columns:repeat(10,1fr)}}
+@media(max-width:520px){main{padding:14px 10px 32px}.panel,.quiz-card,.result-card{padding:15px}.number-grid{grid-template-columns:repeat(5,1fr)}.question{font-size:1.05rem}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>MCQ Practice Quiz</h1><p>500 questions · 5 sets · shuffled questions · results and answer review</p></div></header>
+<main>
+<section id="home">
+  <div class="panel">
+    <h2>Choose a question set</h2>
+    <p class="muted">Each set contains 100 questions from its original range. Questions are shuffled for each attempt, but their original question IDs (Q001–Q500) stay the same.</p>
+    <div class="set-grid" id="sets"></div>
+  </div>
+  <div class="panel">
+    <h2>Quiz settings</h2>
+    <div class="controls">
+      <div class="field"><label for="timerMode">Timer</label><select id="timerMode"><option value="off">No timer</option><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option><option value="custom">Custom duration</option></select></div>
+      <div class="field hidden" id="customWrap"><label for="customMinutes">Minutes</label><input id="customMinutes" type="number" min="1" max="300" value="30"></div>
+      <div class="field"><label for="shuffleOptions">Answer options</label><select id="shuffleOptions"><option value="no">Keep original order</option><option value="yes">Shuffle options too</option></select></div>
+      <div class="field"><label for="negativeMarking">Scoring</label><select id="negativeMarking"><option value="yes">Use sheet marks (+1 / −0.25)</option><option value="no">No negative marking</option></select></div>
+    </div>
+  </div>
+</section>
+<section id="quiz" class="hidden">
+  <div class="quiz-top"><div><div id="quizTitle" style="font-weight:800;font-size:1.15rem"></div><div class="muted" id="quizSubtitle"></div></div><div class="timer" id="timerDisplay">No timer</div></div>
+  <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+  <div class="layout">
+    <div class="quiz-card">
+      <div class="q-meta"><span id="qCounter"></span><span class="pill" id="difficulty"></span><span class="pill" id="qId"></span></div>
+      <div class="question" id="questionText"></div>
+      <div class="options" id="options"></div>
+      <div class="quiz-bottom"><button class="secondary" id="clearAnswer">Clear answer</button><div class="nav-buttons"><button class="secondary" id="prevBtn">← Previous</button><button class="primary" id="nextBtn">Next →</button><button class="danger" id="finishBtn">Finish quiz</button></div></div>
+    </div>
+    <aside class="panel side"><h2>Question navigator</h2><div class="number-grid" id="numberGrid"></div><div class="legend"><span><i class="dot answered"></i>Answered</span><span><i class="dot current"></i>Current</span></div><button class="secondary" style="width:100%;margin-top:10px" id="backHome">Exit to sets</button></aside>
+  </div>
+</section>
+<section id="results" class="hidden">
+  <div class="result-card"><h2>Quiz result</h2><div class="result-score" id="scorePct">0%</div><div class="muted" id="scoreLine"></div><div class="stats" id="stats"></div><button class="primary" id="retryBtn">Retry this set (reshuffle)</button> <button class="secondary" id="homeBtn">Choose another set</button></div>
+  <div class="panel"><h2>Answer review</h2><p class="muted">Correct answers and explanations are shown below after submission.</p><div id="review"></div></div>
+</section>
+</main>
+<footer>Static quiz website — answers are checked in your browser. Your responses are not uploaded to a server.</footer>
+<script src="questions.json"></script>
+<script>
+const DATA_URL = './questions.json';
+let allQuestions = [];
+let currentSet = 1, quizQuestions = [], currentIndex = 0, answers = {}, optionOrders = {}, timerSeconds = 0, timerInterval = null, deadline = null, submitted = false;
+const $ = id => document.getElementById(id);
+const sets = [
+  {n:1,start:1,end:100},{n:2,start:101,end:200},{n:3,start:201,end:300},{n:4,start:301,end:400},{n:5,start:401,end:500}
+];
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+async function init(){
+  try {
+    const r = await fetch(DATA_URL); if(!r.ok) throw new Error('Could not load questions.json');
+    allQuestions = await r.json();
+    renderSets();
+  } catch(e) {
+    $('home').innerHTML = '<div class="panel"><h2>Could not load the question bank</h2><p>Keep <b>index.html</b> and <b>questions.json</b> in the same folder. For local use, run a small local server (instructions are in README.txt).</p><p class="muted">'+e.message+'</p></div>';
+  }
+}
+function renderSets(){
+  $('sets').innerHTML = sets.map(s=>`<button class="set-btn" data-set="${s.n}"><strong>Set ${s.n}</strong><span>Questions ${s.start}–${s.end}</span><span>100 questions · shuffled</span></button>`).join('');
+  document.querySelectorAll('[data-set]').forEach(b=>b.addEventListener('click',()=>startQuiz(Number(b.dataset.set))));
+}
+$('timerMode').addEventListener('change',()=> $('customWrap').classList.toggle('hidden',$('timerMode').value!=='custom'));
+function startQuiz(setNo){
+  currentSet=setNo;const range=sets[setNo-1];
+  quizQuestions=shuffle(allQuestions.filter(q=>q.number>=range.start&&q.number<=range.end));
+  answers={};optionOrders={};currentIndex=0;submitted=false;
+  if($('shuffleOptions').value==='yes') quizQuestions.forEach(q=>optionOrders[q.id]=shuffle(['A','B','C','D']));
+  else quizQuestions.forEach(q=>optionOrders[q.id]=['A','B','C','D']);
+  const mode=$('timerMode').value;
+  timerSeconds=mode==='off'?0:(mode==='custom'?Math.max(1,Number($('customMinutes').value)||30):Number(mode))*60;
+  deadline=timerSeconds?Date.now()+timerSeconds*1000:null;
+  $('home').classList.add('hidden');$('results').classList.add('hidden');$('quiz').classList.remove('hidden');
+  $('quizTitle').textContent=`Set ${setNo}`;$('quizSubtitle').textContent=`Questions ${range.start}–${range.end} · 100 questions`;
+  buildNavigator();renderQuestion();updateTimer();
+  if(timerInterval)clearInterval(timerInterval);
+  if(timerSeconds)timerInterval=setInterval(updateTimer,500);
+}
+function buildNavigator(){
+  $('numberGrid').innerHTML=quizQuestions.map((q,i)=>`<button class="num-btn" data-index="${i}" title="${q.id}">${q.number}</button>`).join('');
+  document.querySelectorAll('.num-btn').forEach(b=>b.addEventListener('click',()=>{currentIndex=Number(b.dataset.index);renderQuestion();}));
+}
+function renderQuestion(){
+  const q=quizQuestions[currentIndex];
+  $('qCounter').textContent=`Question ${currentIndex+1} of ${quizQuestions.length}`;
+  $('qId').textContent=q.id;$('difficulty').textContent=q.difficulty||'Question';
+  $('questionText').textContent=q.question;
+  const selected=answers[q.id]||'';
+  $('options').innerHTML=optionOrders[q.id].map(letter=>{
+    const text=q.options['ABCD'.indexOf(letter)];
+    return `<label class="option ${selected===letter?'selected':''}"><input type="radio" name="answer" value="${letter}" ${selected===letter?'checked':''}><span class="letter">${letter}.</span><span>${escapeHtml(text)}</span></label>`;
+  }).join('');
+  $('options').querySelectorAll('input').forEach(r=>r.addEventListener('change',()=>{answers[q.id]=r.value;renderQuestion();}));
+  $('prevBtn').disabled=currentIndex===0;$('nextBtn').textContent=currentIndex===quizQuestions.length-1?'Last question →':'Next →';
+  $('progress').style.width=`${(currentIndex+1)/quizQuestions.length*100}%`;
+  document.querySelectorAll('.num-btn').forEach((b,i)=>{b.classList.toggle('current',i===currentIndex);b.classList.toggle('answered',!!answers[quizQuestions[i].id]);});
+}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+$('prevBtn').onclick=()=>{if(currentIndex>0){currentIndex--;renderQuestion();}};
+$('nextBtn').onclick=()=>{if(currentIndex<quizQuestions.length-1){currentIndex++;renderQuestion();}};
+$('clearAnswer').onclick=()=>{delete answers[quizQuestions[currentIndex].id];renderQuestion();};
+$('finishBtn').onclick=()=>{const blank=quizQuestions.length-Object.keys(answers).length;if(blank>0&&!confirm(`You have ${blank} unanswered question(s). Submit anyway?`))return;finishQuiz(false);};
+$('backHome').onclick=()=>{if(confirm('Exit this attempt? Your answers in this attempt will be discarded.')){stopTimer();$('quiz').classList.add('hidden');$('home').classList.remove('hidden');}};
+function updateTimer(){
+  if(!deadline){$('timerDisplay').textContent='No timer';return;}
+  timerSeconds=Math.max(0,Math.ceil((deadline-Date.now())/1000));
+  const m=Math.floor(timerSeconds/60),s=timerSeconds%60;
+  $('timerDisplay').textContent=`Time left ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  $('timerDisplay').classList.toggle('low',timerSeconds<=300);
+  if(timerSeconds<=0){stopTimer();finishQuiz(true);}
+}
+function stopTimer(){if(timerInterval)clearInterval(timerInterval);timerInterval=null;}
+function finishQuiz(timeUp){
+  if(submitted)return;submitted=true;stopTimer();
+  let correct=0,wrong=0,unanswered=0,score=0,maxScore=0;
+  const negative=$('negativeMarking').value==='yes';
+  quizQuestions.forEach(q=>{maxScore+=q.score;const a=answers[q.id];if(!a){unanswered++;}else if(a===q.correct){correct++;score+=q.score;}else{wrong++;if(negative)score-=q.negativeScore;}});
+  const pct=maxScore?Math.max(0,score/maxScore*100):0;
+  $('quiz').classList.add('hidden');$('results').classList.remove('hidden');
+  $('scorePct').textContent=`${pct.toFixed(1)}%`;
+  $('scoreLine').textContent=`Set ${currentSet}${timeUp?' · Time expired — submitted automatically':''} · Score ${score.toFixed(2)} / ${maxScore.toFixed(2)}`;
+  $('stats').innerHTML=[['Correct',correct],['Incorrect',wrong],['Unanswered',unanswered],['Attempted',correct+wrong]].map(([a,b])=>`<div class="stat"><span class="muted">${a}</span><strong>${b}</strong></div>`).join('');
+  $('review').innerHTML=quizQuestions.map((q,i)=>{
+    const a=answers[q.id],isCorrect=a===q.correct,cls=!a?'unanswered':isCorrect?'correct':'wrong';
+    const chosen=a?`${a}. ${q.options['ABCD'.indexOf(a)]}`:'Not answered';
+    const right=q.correct?`${q.correct}. ${q.options['ABCD'.indexOf(q.correct)]}`:'Answer key missing';
+    return `<article class="review-item ${cls}"><div class="q-meta"><span class="pill">${q.id}</span><span>Quiz position ${i+1}</span></div><div class="question">${escapeHtml(q.question)}</div><div class="review-options"><div class="${isCorrect?'right':a?'wrong-text':''}">Your answer: ${escapeHtml(chosen)}</div><div class="right">Correct answer: ${escapeHtml(right)}</div></div>${q.explanation?`<p class="muted">${escapeHtml(q.explanation)}</p>`:''}</article>`;
+  }).join('');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('retryBtn').onclick=()=>startQuiz(currentSet);
+$('homeBtn').onclick=()=>{$('results').classList.add('hidden');$('home').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});};
+init();
+</script>
+</body>
+</html>
